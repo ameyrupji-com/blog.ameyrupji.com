@@ -9,7 +9,7 @@ deploy_base_image: &deploy_base_image
   circleci/python:2.7
 
 working_directory: &working_directory
-  ~/ameyrupji
+  ~/blog-ameyrupji
   
 deploy_default_config: &deploy_default_config
   docker:
@@ -25,9 +25,18 @@ jobs:
     steps:
       - checkout
       - aws-s3/copy:
-          from: /home/circleci/ameyrupji/src/ 
+          from: /home/circleci/blog-ameyrupji/src/ 
           to: s3://blog.ameyrupji.com/
           arguments: --recursive
+  upload-develop:
+    <<: *deploy_default_config
+    steps:
+      - checkout
+      - aws-s3/copy:
+          from: /home/circleci/blog-ameyrupji/src/
+          to: s3://blog.beta.ameyrupji.com/
+          arguments: --recursive
+
 
 workflows:
   version: 2
@@ -44,3 +53,7 @@ workflows:
           filters:
               branches:
                 only: master
+      - upload-develop:
+          filters:
+              branches:
+                only: develop
